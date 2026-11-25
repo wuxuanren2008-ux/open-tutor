@@ -1,0 +1,16 @@
+# 运行时数据（可能含密钥 / 学习记录）
+data/
+*.db
+config.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# 日志与系统
+*.log
+.DS_Store
+Thumbs.db

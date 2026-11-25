@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenTutor · 开源 AI 导师</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">OT</div>
+      <div><h1>OpenTutor</h1><p>开源 AI 导学</p></div>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="chat">💬 解题对话</button>
+      <button class="tab" data-tab="board">📋 白板步骤</button>
+      <button class="tab" data-tab="review">🧠 间隔复习</button>
+      <button class="tab" data-tab="artifacts">📚 学习产物</button>
+      <button class="tab" data-tab="exam">🎯 备考题库</button>
+      <button class="tab" data-tab="settings">⚙️ 模型设置</button>
+    </nav>
+    <div class="sessions">
+      <div class="sessions-head"><span>会话</span><button id="newSession" title="新建会话">＋</button></div>
+      <div id="sessionList"></div>
+    </div>
+    <div class="status" id="statusBar">● 就绪</div>
+  </aside>
+
+  <main class="main">
+    <!-- 对话 -->
+    <section class="view active" id="view-chat">
+      <header class="view-head">
+        <div><h2>解题对话</h2><p class="sub">不直接给答案，一步步引导你自己想出来</p></div>
+        <select id="subjectSelect" class="subject"></select>
+      </header>
+      <div class="chat" id="chatBox">
+        <div class="empty" id="chatEmpty">选一门学科，然后把你的问题发过来吧 👋</div>
+      </div>
+      <div class="composer">
+        <textarea id="questionInput" placeholder="输入你的问题，Ctrl+Enter 发送…" rows="2"></textarea>
+        <button id="sendBtn" class="primary">发送</button>
+      </div>
+    </section>
+
+    <!-- 白板 -->
+    <section class="view" id="view-board">
+      <header class="view-head"><div><h2>白板步骤</h2><p class="sub">把解答拆成可逐步揭示的板书</p></div></header>
+      <div class="board-wrap">
+        <label>题目</label>
+        <textarea id="boardQuestion" rows="2" placeholder="输入题目…"></textarea>
+        <label>参考解答（可粘贴，留空则用最近一次对话）</label>
+        <textarea id="boardAnswer" rows="4" placeholder="把解答粘贴到这里…"></textarea>
+        <button id="boardBtn" class="primary">生成分步板书</button>
+        <div class="board-out" id="boardOut"></div>
+      </div>
+    </section>
+
+    <!-- 复习 -->
+    <section class="view" id="view-review">
+      <header class="view-head"><div><h2>间隔复习</h2><p class="sub">按 1→3→7→16 天节奏巩固,答错自动回炉</p></div>
+        <button id="loadCards" class="ghost">加载待复习</button></header>
+      <div id="cardList" class="cards"></div>
+    </section>
+
+    <!-- 产物 -->
+    <section class="view" id="view-artifacts">
+      <header class="view-head"><div><h2>学习产物</h2><p class="sub">把对话整理成笔记、解题过程、抽认卡</p></div></header>
+      <div class="artifact-actions">
+        <button data-kind="notes" class="ghost">📝 生成笔记</button>
+        <button data-kind="solution" class="ghost">✅ 生成解题过程</button>
+        <button data-kind="flashcards" class="ghost">🃏 生成抽认卡</button>
+      </div>
+      <div id="artifactList" class="artifact-list"></div>
+    </section>
+
+    <!-- 题库 -->
+    <section class="view" id="view-exam">
+      <header class="view-head"><div><h2>备考题库</h2><p class="sub">SAT / AP / 通用学科示例题（数据可扩展）</p></div>
+        <select id="examSelect" class="subject"></select></header>
+      <div id="questionBank" class="cards"></div>
+    </section>
+
+    <!-- 设置 -->
+    <section class="view" id="view-settings">
+      <header class="view-head"><div><h2>模型设置</h2><p class="sub">接你自己的 API，或用本地模型；密钥只存本机</p></div></header>
+      <div class="settings">
+        <label>模型来源</label>
+        <select id="providerSelect">
+          <option value="offline">离线导学（无需网络，规则引导）</option>
+          <option value="openai">OpenAI 兼容 API（DeepSeek / OpenAI / 中转订阅 / LM Studio）</option>
+          <option value="ollama">本地 Ollama 模型</option>
+        </select>
+        <div id="apiFields" class="field-group">
+          <label>Base URL</label>
+          <input id="baseUrl" placeholder="https://api.deepseek.com/v1">
+          <label>API Key</label>
+          <input id="apiKey" type="password" placeholder="留空则保留原密钥；也可用环境变量 OPEN_TUTOR_API_KEY">
+          <label>模型名</label>
+          <input id="modelName" placeholder="deepseek-chat">
+        </div>
+        <div id="ollamaFields" class="field-group">
+          <label>Ollama 地址</label>
+          <input id="ollamaUrl" placeholder="http://127.0.0.1:11434">
+          <label>本地模型名</label>
+          <input id="ollamaModel" placeholder="qwen2.5">
+          <p class="hint">本地用法：先装 Ollama，运行 <code>ollama pull qwen2.5</code>，再选此项。</p>
+        </div>
+        <div class="settings-actions">
+          <button id="saveConfig" class="primary">保存并测试连接</button>
+          <span id="configNote"></span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
