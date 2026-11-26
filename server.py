@@ -181,12 +181,28 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
 
+def pick_server(start_port):
+    """端口被占用时自动往后找一个可用端口，最多试 20 个。"""
+    last = None
+    for p in range(start_port, start_port + 20):
+        try:
+            return ThreadingHTTPServer((HOST, p), Handler), p
+        except OSError as e:
+            last = e
+    raise SystemExit("端口 %d-%d 都被占用，请设 OPEN_TUTOR_PORT 指定其它端口。" %
+                     (start_port, start_port + 19))
+
+
 def main():
     store.init()
-    print("OpenTutor running at http://%s:%d/" % (HOST, PORT))
-    print("Provider:", config.get_config()["provider"])
+    srv, port = pick_server(PORT)
+    url = "http://%s:%d/" % (HOST if HOST != "0.0.0.0" else "127.0.0.1", port)
+    print("OpenTutor running at " + url, flush=True)
+    print("Provider:", config.get_config()["provider"], flush=True)
+    if port != PORT:
+        print("端口 %d 被占用，已自动改用 %d。" % (PORT, port), flush=True)
     try:
-        ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
+        srv.serve_forever()
     except KeyboardInterrupt:
         print("\nstopped.")
 
