@@ -3,7 +3,9 @@ import os
 import sqlite3
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "data", "tutor.db")
+import paths
+
+DB_PATH = os.path.join(paths.data_dir(), "tutor.db")
 
 
 def _conn():

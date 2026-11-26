@@ -8,7 +8,9 @@
 import json
 import os
 
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "data", "config.json")
+import paths
+
+CONFIG_PATH = os.path.join(paths.data_dir(), "config.json")
 
 DEFAULTS = {
     "provider": "offline",          # offline | openai | ollama

@@ -10,11 +10,11 @@ import config
 import curriculum
 import memory
 import model_provider
+import paths
 import store
 import tutor
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
-STATIC = os.path.join(ROOT, "static")
+STATIC = paths.static_dir()
 HOST = os.environ.get("OPEN_TUTOR_HOST", "127.0.0.1")
 PORT = int(os.environ.get("OPEN_TUTOR_PORT", "8766"))
 

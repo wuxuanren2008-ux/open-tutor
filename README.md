@@ -33,22 +33,27 @@ Sia 是面向留学生的付费 AI 辅导软件：解题对话、白板分步板
 
 ## 快速开始
 
+### 方式一：桌面软件（推荐，Windows）
+
+下载 `OpenTutor.exe`，双击即可。它会开出一个**独立窗口**（没有浏览器地址栏，和普通软件一样），关掉窗口软件就退出。
+
+- 无需安装 Python，无需输入网址。
+- 你的会话和设置存在 exe 同目录的 `data/` 里，关掉重开不会丢。
+- 首次运行会在 `data/edge-profile/` 建一个独立浏览器配置，不影响你日常的 Edge。
+
+自己打包：先 `pip install pyinstaller pillow`，再双击 `build.bat`，产物在 `dist/OpenTutor.exe`。
+
+### 方式二：源码运行（全平台）
+
 需要 Python 3.8+（只用标准库，无需 `pip install`）。
 
 ```bash
-# 1. 进入目录
 cd open-tutor
-
-# 2.（可选）先跑自检
-python selftest.py
-
-# 3. 启动
+python selftest.py      # 可选：自检
 python server.py
 ```
 
-浏览器打开 **http://127.0.0.1:8766** 。
-
-Windows 用户可直接双击 `start.bat`。
+浏览器打开 **http://127.0.0.1:8766** 。Windows 用户可直接双击 `start.bat`。端口被占用会自动换一个。
 
 ## 目录结构
 
@@ -61,9 +66,13 @@ open-tutor/
 ├── memory.py           # 间隔复习算法
 ├── store.py            # SQLite 持久化
 ├── curriculum.py       # 内置题库与学科
-├── selftest.py         # 自检（33 项）
+├── selftest.py         # 自检（36 项）
+├── paths.py            # 统一路径（源码/exe 通吃，数据落 exe 旁）
+├── desktop.py          # 桌面版入口：内置服务 + Edge 独立窗口
+├── make_icon.py        # 生成软件图标
+├── build.bat           # 一键打包成 OpenTutor.exe
 ├── static/             # Web 前端（原生 HTML/CSS/JS）
-├── start.py / start.bat# 启动脚本
+├── start.py / start.bat# 源码启动脚本
 ├── data/               # 运行时生成：config.json、tutor.db（gitignore）
 └── README.md / LICENSE
 ```
