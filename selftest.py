@@ -88,6 +88,12 @@ def main():
     check("进度计数", int(store.get_progress("questions")) == 3)
 
     section("5. 导学逻辑")
+    # 回归：导学请求不得被误判成学习产物（提示词里含"解题过程/步骤"等普通词）
+    normal = tutor.tutor_reply(model_provider.OfflineProvider(), [], "求 x^2 的最小值", "MATH")
+    check("导学回复不是产物标题", "# 解题过程" not in normal and "# 学习笔记" not in normal)
+    check("导学回复是引导步骤", "先说说" in normal and "1." in normal)
+    board_test = tutor.board_steps(model_provider.OfflineProvider(), "求导得解", "题目")
+    check("板书走独立分支", "【步骤1】" in board_test)
     msgs = tutor.build_messages([{"role": "user", "content": "旧问题"}], "新问题", "MATH")
     check("系统提示置顶", msgs[0]["role"] == "system" and "苏格拉底" in msgs[0]["content"])
     check("学科注入", any("MATH" in m.get("content", "") for m in msgs))

@@ -92,27 +92,24 @@ class OfflineProvider:
     def chat(self, messages, **kwargs):
         sys_text = " ".join(m.get("content", "") for m in messages if m.get("role") == "system")
 
-        # 学习产物请求：从拼接的对话里抽出学生问题
-        if "抽认卡" in sys_text or "生成抽认卡" in sys_text:
+        # 用精确标记判断请求类型，避免与导学提示词里的普通词（如"步骤""解题过程"）误撞
+        if "[OPENTUTOR:ARTIFACT" in sys_text:
+            kind = "flashcards" if "ARTIFACT:flashcards" in sys_text else "notes"
             convo = _last_user(messages)
             questions = [seg.split("导师：")[0].strip() for seg in convo.split("学生：")[1:]]
             questions = [q for q in questions if q][:8]
-            if not questions:
-                questions = ["示例问题：离线模式演示"]
-            return "\n".join("%s | （离线模式：请自行填写答案，接入 API 后自动生成）" % q[:80]
-                             for q in questions)
-
-        if "学习笔记" in sys_text or "解题过程" in sys_text:
-            convo = _last_user(messages)
-            questions = [seg.split("导师：")[0].strip() for seg in convo.split("学生：")[1:]]
-            questions = [q for q in questions if q][:8]
+            if kind == "flashcards":
+                if not questions:
+                    questions = ["示例问题：离线模式演示"]
+                return "\n".join("%s | （离线模式：请自行填写答案，接入 API 后自动生成）" % q[:80]
+                                 for q in questions)
             body = "\n".join("%d. %s" % (i + 1, q[:80]) for i, q in enumerate(questions))
-            heading = "解题过程" if "解题过程" in sys_text else "学习笔记"
+            heading = "解题过程" if "ARTIFACT:solution" in sys_text else "学习笔记"
             return ("# %s（离线模式）\n\n## 涉及问题\n%s\n\n"
                     "## 待补充\n接入 API 或本地模型后，这里会自动生成完整讲解、公式与易错点。"
                     % (heading, body or "- 暂无对话内容"))
 
-        if "白板" in sys_text or "板书" in sys_text or "步骤" in sys_text:
+        if "[OPENTUTOR:BOARD]" in sys_text:
             convo = _last_user(messages)
             answer = convo.split("参考解答：")[-1].strip() if "参考解答：" in convo else convo
             blocks = [b.strip() for b in answer.split("\n") if b.strip()][:8] or ["先理解题意"]

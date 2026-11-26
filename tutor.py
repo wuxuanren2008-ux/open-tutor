@@ -12,6 +12,7 @@ SYSTEM_TUTOR = (
 )
 
 SYSTEM_BOARD = (
+    "[OPENTUTOR:BOARD]\n"
     "把下面的解答拆成白板式分步板书。每一步用形如「【步骤N】标题」开头，"
     "下面是该步的要点，简洁、适合逐步揭示。只输出步骤，不要额外寒暄。"
 )
@@ -69,7 +70,7 @@ def parse_board(text):
 
 def make_artifact(provider, kind, history):
     """生成学习产物：笔记 / 解题过程 / 抽认卡。"""
-    sys_prompt = SYSTEM_ARTIFACT.get(kind, SYSTEM_ARTIFACT["notes"])
+    sys_prompt = "[OPENTUTOR:ARTIFACT:%s]\n" % kind + SYSTEM_ARTIFACT.get(kind, SYSTEM_ARTIFACT["notes"])
     convo = "\n\n".join(
         ("学生：" if m.get("role") == "user" else "导师：") + m.get("content", "")
         for m in history if m.get("role") in ("user", "assistant")
